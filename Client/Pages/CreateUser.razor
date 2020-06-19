@@ -1,0 +1,55 @@
+﻿@page "/user/create"
+@inject IUserRepository  userRepository
+@inject NavigationManager manager
+@inject HttpClient Http
+
+<h3>Создание пользователя</h3>
+
+<EditForm Model="user" OnSubmit="Create">
+    <div class="form-group">
+        <label>Имя:</label>
+        <div>
+            <InputText class="form-control" @bind-Value=@user.Name />
+        </div>
+        <label>Отдел:</label>
+        <div>
+            <select class="form-control" @bind=@depId>
+                <option value=0>Выберите отдел...</option>
+                @foreach (var department in departments)
+                {
+                    <option value=@department.Id>@department.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+    @if (departments.Length > 0)
+    {
+        <button class="btn btn-dark" type="submit">Сохранить</button>
+    }
+    else
+    {
+        <p>Для добавления пользователя сначала добавьте отдел</p>
+    }
+</EditForm>
+
+@code {
+    private User user = new User();
+    private int depId = 0;
+    private Department[] departments = new Department[0];
+
+    private async Task Create()
+    {
+        Console.WriteLine($"{depId}");
+        user.DepId = depId;
+        if (user.DepId != 0)
+        {
+            await userRepository.CreateUser(user);
+            manager.NavigateTo("/");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        departments = await Http.GetJsonAsync<Department[]>("api/Department");
+    }
+}

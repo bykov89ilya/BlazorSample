@@ -1,0 +1,25 @@
+﻿@page "/department/create"
+@inject IDepartmentRepository  departmentRepository
+@inject NavigationManager manager
+
+<h3>Создание отдела</h3>
+
+<EditForm Model="department" OnSubmit="Create">
+    <div class="form-group">
+        <label>Имя:</label>
+        <div>
+            <InputText class="form-control" @bind-Value=@department.Name />
+        </div>
+    </div>
+    <button class="btn btn-dark" type="submit">Сохранить</button>
+</EditForm>
+
+@code {
+    private Department department = new Department();
+
+    private async Task Create()
+    {
+        await departmentRepository.CreateDepartment(department);
+        manager.NavigateTo("department");    
+    }
+}

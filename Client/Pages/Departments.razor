@@ -1,0 +1,53 @@
+﻿@page "/department"
+
+@inject HttpClient Http
+@inject IDepartmentRepository departmentRepository
+
+@if (departments == null)
+{
+    <p><em>Загрузка...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Имя</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var department in departments)
+            {
+                <tr>
+                    <td>@department.Id</td>
+                    <td>@department.Name</td>
+                    <td>
+                        <a class="btn btn-success" href="/department/edit/@department.Id">Редактировать</a>
+                        <button class="btn btn-danger" @onclick="@(() => DeleteDepartment(department.Id))">Удалить</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="form-group">
+        <a class="btn btn-info" href="department/create">Создать отдел</a>
+    </div>
+}
+
+@code {
+    private List<Department> departments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        departments = await departmentRepository.GetDepartments();
+    }
+
+    private async Task DeleteDepartment(int id)
+    {
+        await departmentRepository.DeleteDepartment(id);
+        departments = await departmentRepository.GetDepartments();
+    }
+}
